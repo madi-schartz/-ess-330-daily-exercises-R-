@@ -1,0 +1,76 @@
+---
+title: "Daily Assignment 5: Madi Schartz"
+Author: Madi Schartz
+format: html
+execute: 
+  echo: true
+---
+###Questions:
+
+###question: 1. Examine at the dataset using the ?Help page
+
+```{r}
+library(palmerpenguins)
+data("penguins")
+?penguins
+
+```
+
+###question: 2. what is the class of the penguins data set?
+answer: The data is in a table format and data frame.
+```{r}
+class(penguins)
+```
+
+###question:  3. what is the structure of the penguins data set?
+answer: The structure of the penguins data set is in a table where there are 8 variables recorded consisting of: species type, island, bill length in mm, bill depth in mm, flipper length in mm, body mass in grams, the sex of the penguin, and the year.  
+
+```{r}
+str(penguins)
+```
+
+###question: 4. what are the dimensions of the penguins dataset?
+answer: the dimensions of this data set are 8 columns and 344 rows of data recorded. 
+```{r}
+dim(penguins)
+```
+
+###question: 5. what are the column names of the penguins dataset?
+answer: The column names consist of: species type, island, bill length in mm, bill depth in mm, flipper length in mm, body mass in grams, the sex of the penguin, and the year. 
+```{r}
+colnames(penguins)
+```
+
+### question: 6. what type of data is `flipper_length_mm` and `Island`?
+answer: The flipper length is an example of integer data and the island is an example of factor data.
+```{r}
+class(penguins$flipper_length_mm) #Numeric
+ class(penguins$island) # Factor (Categorical)
+```
+
+###question: 7. what is the mean flipper length of the penguins?
+answer: The mean flipper length is 200.9152 mm
+```{r}
+mean(penguins$flipper_length_mm, na.rm = TRUE)
+
+```
+
+###question:  8. what is the standard deviation of flipper length in the penguins?
+answer: The standard deviation of the flipper length in the penguins is 14.06171 units
+```{r}
+ sd(penguins$flipper_length_mm, na.rm = TRUE)
+```
+
+###question:  9. what is the median body mass of the penguins?
+answer: the median body mass of the penguins is 4050 g
+```{r}
+median(penguins$body_mass_g, na.rm = TRUE)
+```
+
+###question:  10. what is the Island of the 100th penguin?
+answer: The island of the 100th penguin is Biscoe Dream Torgersen.
+```{r}
+penguins$island[100]
+```
+
+
