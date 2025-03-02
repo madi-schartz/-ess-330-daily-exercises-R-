@@ -1,0 +1,7 @@
+"0","library(broom)"
+"0",""
+"0","lm_model <- lm(Ozone ~ Solar.R, data = airquality_clean)"
+"0",""
+"0","a <- augment(lm_model)"
+"0",""
+"0",""

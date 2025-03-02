@@ -1,0 +1,17 @@
+{
+  "hash": "87d2cae7e029e8b98b58e977718344c9",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"dailyexcercise9\"\nformat: html\nauthor: Madi Schartz\necho: true \n---\n\n\n###Question 1 : \n\n\n::: {.cell}\n\n```{.r .cell-code}\n?\"airquality\"\n```\n\n::: {.cell-output .cell-output-stderr}\n\n```\nstarting httpd help server ... done\n```\n\n\n:::\n:::\n\n\n\n###Question 2 :\n\n\n::: {.cell}\n\n```{.r .cell-code}\nairquality_clean <- na.omit(airquality)\n```\n:::\n\n\n\n###Question 3 & 4 : \nI decided to use a linear model to see if solar has any correlation with ozone levels. \n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(broom)\n\nlm_model <- lm(Ozone ~ Solar.R, data = airquality_clean)\n\na <- augment(lm_model)\n```\n:::\n\n\n###Question 5 : \nThe R squared is found to be a value of 0.12 which means that this model doesn't explain much of ozone variation despite the solar r being significant it doesn't have strong explanatory power. \n\n###Question 6 :\n\n\n::: {.cell}\n\n```{.r .cell-code}\nsummary(lm_model)\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n\nCall:\nlm(formula = Ozone ~ Solar.R, data = airquality_clean)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-48.292 -21.361  -8.864  16.373 119.136 \n\nCoefficients:\n            Estimate Std. Error t value Pr(>|t|)    \n(Intercept) 18.59873    6.74790   2.756 0.006856 ** \nSolar.R      0.12717    0.03278   3.880 0.000179 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 31.33 on 109 degrees of freedom\nMultiple R-squared:  0.1213,\tAdjusted R-squared:  0.1133 \nF-statistic: 15.05 on 1 and 109 DF,  p-value: 0.0001793\n```\n\n\n:::\n:::\n\n\n\n###Question 7 :\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlibrary(ggplot2)\n\nggplot(a, aes(x = Ozone, y = .fitted)) +\n  geom_point() +  # scatter plot of actual vs predicted Ozone\n  geom_abline(intercept = 0, slope = 1, color = \"red\") +  # 1:1 line\n  labs(\n    title = \"Actual vs Predicted Ozone\",\n    subtitle = paste(\"Correlation: \", round(cor(a$Ozone, a$.fitted), 2)),\n    x = \"Actual Ozone\",\n    y = \"Predicted Ozone\"\n  ) +\n  theme_minimal()\n```\n\n::: {.cell-output-display}\n![](dailyexcercise9_files/figure-html/unnamed-chunk-5-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "dailyexcercise9_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
