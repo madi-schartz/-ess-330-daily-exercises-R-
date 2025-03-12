@@ -196,3 +196,4 @@ ggscatter(augmented_data, x = "Ozone", y = ".fitted",
 
 ### Question 19 : How strong of a model do you think this is?
 
+###### Answer : I think this model is relativly strong as it has a R-squared value of 0.84 which means that 84% of the variation in Ozone is represented throughout the models predictions and the p-value is extremely small showing it is statistcally significant. 
