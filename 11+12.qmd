@@ -1,0 +1,198 @@
+---
+title: "Daily Excercise 11 & 12"
+author: "Madi Schartz"
+date: "2025-03-11"
+format: html
+execute:
+  echo: true
+---
+
+### Loading in necessary packages
+```{r}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(broom)
+library(purrr)
+library(visdat)
+library(ggpubr)
+library(recipes)
+```
+
+## Part 1: Normality Testing
+
+### Question 1 : Load the airquality dataset in R. What does this dataset represent?
+
+###### Answer :  This data represents the daily air quality measurements in New York from May to September in 1973. This data frame consists of 153 observations throughout the six variables of Ozone (ppb), Solar R (lang), Wind (mph), Temperature (degrees F), Month (1-12), and Day (1-31). 
+
+```{r}
+?airquality
+str(airquality)
+summary(airquality)
+```
+
+
+### Question 2 : Perform a Shapiro-Wilk normality test on the following variables: Ozone, Temp, Solar.R, and Wind.
+
+```{r}
+airquality <- na.omit(airquality)
+
+shapiro.test(airquality$Ozone)
+shapiro.test(airquality$Temp)
+shapiro.test(airquality$Solar.R)
+shapiro.test(airquality$Wind)
+```
+
+### Question 3 : What is the purpose of the Shapiro-Wilk test?
+
+###### Answer : The purpose of doing the Shapiro-Wilk test is so we can see if the residuals within our data set are normally distributed and quickly check the scedasticity. 
+
+### Question 4 : What are the null and alternative hypotheses for this test?
+
+###### Answer :  The null hypothesis is that our data is normally distrubted. Our alternative hypothesis is that our data is distrbuted in another way other than normally. 
+
+### Question 5 : Interpret the p-values. Are these variables normally distributed?
+
+
+###### Answer : I ran the Shaprio-Wilk test on four out of the six variables in this dataset which were Ozone, Temp, Solar.R, and Wind. As we know, having a p-value <0.05 means that it is signifcant enough to reject the null hypothesis and if it is above 0.05 then we fail to reject the hypothesis. 
+
+For the Ozone residual it had the p-value of 2.846e-08 and is normally distributed.
+
+For the Temperature residual it had a p-value of 0.09569 and is not normally distributed. 
+
+For the Solar.R residual it had a p-value of 2.957e-05 and is normally distributed. 
+
+For the Wind residual it had a p-value of 0.1099 and is not normally distributed. 
+
+
+## Part 2 : Data Transformation and Feature Engineering 
+
+### Question 6 : Create a new column with case_when tranlating the Months into four seasons (Winter (Nov, Dec, Jan), Spring (Feb, Mar, Apr), Summer (May, Jun, Jul), and Fall (Aug, Sep, Oct)).
+
+```{r}
+airquality <- airquality |>
+  mutate(Season = case_when(
+    Month %in% c(11, 12, 1) ~ "Winter",
+    Month %in% c(2, 3, 4) ~ "Spring",
+    Month %in% c(5, 6, 7) ~ "Summer",
+    Month %in% c(8, 9, 10) ~ "Fall"))
+```
+
+### Question 7 : Use table to figure out how many observations we have from each season.
+
+###### Answer : There are 52 observations that fall in the season Fall and 59 observations that fall in the Summer season. 
+
+```{r}
+table(airquality$Season)
+```
+
+
+## Part 3 : Data Preprocessing
+
+### Question 8 : Normalize the predictor variables (Temp, Solar.R, Wind, and Season) using a recipe
+
+```{r}
+# Creating the recipe: 
+recipe <- recipe(Ozone ~ Temp + Solar.R + Wind + Season, data = airquality) %>%
+  step_center(all_numeric()) %>%  
+  step_scale(all_numeric())
+```
+
+### Question 9 : What is the purpose of normalizing data?
+
+###### Answer : The purpose in normalizing data is so that we are able to fairly compare variables and interpret their relationships correctly, if the data is skewed then we aren't able to compare justly. 
+
+### Question 10 : What function can be used to impute missing values with the mean?
+
+###### Answer : step_impute_mean() is a function that can likely replace missing values with the mean of the column.
+
+
+### Question 11 : prep and bake the data to generate a processed dataset.
+
+```{r}
+prep_recipe <- prep(recipe, training = airquality)
+normalized_data <- bake(prep_recipe, new_data = NULL) 
+```
+
+### Question 12 : Why is it necessary to both prep() and bake() the recipe?
+
+###### Answer : It's necessary to both prep and bake the recipe since prepping it estimates the parameters for the transformations and baking it applies those transformations to the dataset. This deals with mean, standard deviations, etc which is needed for scaling purposes. 
+
+
+## Part 4 :Building a Linear Regression Model
+
+### Question 13 : Fit a linear model using Ozone as the response variable and all other variables as predictors. Remeber that the . notation can we used to include all variables.
+
+```{r}
+model <- lm(Ozone ~ ., data = airquality)
+```
+
+### Question 14 : Interpret the model summary output (coefficients, R-squared, p-values) in plain language
+
+###### Answer : The model summary output gave us the relationship of Ozone levels based on the other variables. 
+The residuals gave us the understanding of how far off the models predictions are and since it's showing a large range with the minimum being -37.129 to the maximum being 91.802 which suggests large errors. 
+
+The coefficients show the relationship of our response variable (Ozone) with the predictor variables of Solar, Wind, Temperature, Month, Day, and Season. It shows the intercept values which tells us that for every unit of the predictor variables, the ozone will decrease/increase whatever value is listed. 
+
+Overall, this model shows around 63% of variation (R squared value) in Ozone levels and is statistically significant with its p-value of < 2.2e-16. This means that the relationship between Ozone levels and its predictor variables are most likely true instead of coincidental. 
+
+```{r}
+summary(model)
+```
+
+## Part 5 :Building a Linear Regression Mode
+
+### Question 15 : Use broom::augment to suppliment the normalized data.frame with the fitted values and residuals
+
+```{r}
+augmented_data <- augment(model, normalized_data)
+```
+
+### Question 16 : Extract the residuals and visualize their distribution as a histogram and qqplot.
+
+```{r}
+residuals <- augmented_data |>
+  select(.resid)
+
+# Plot histogram and qqplot
+par(mfrow = c(1, 2))  # Arrange plots side by side
+
+# Histogram
+residuals <- as.numeric(augmented_data$.resid)
+
+hist(residuals, main = "Residuals Histogram", xlab = "Residuals", col = "darkgreen")
+
+# QQ plot
+qqnorm(residuals)
+qqline(residuals, col = "red")
+```
+
+### Question 17 : Use ggarange to plot this as one image and interpret what you see in them.
+
+###### Answer : The histogram created by the ggarange shows the residual values to be mostly normally distributed with a few outliers to the right making it look a little skewed. The bulk of residual values lays around 0 with a range of -50 to 50 with a couple around 70 and 90. The QQplot of residuals show the same story with majority of values staying with the line but as X gets larger the values slightly start to deviate from the line. 
+
+```{r}
+hist_plot <- ggplot(data.frame(residuals), aes(x = residuals)) +
+  geom_histogram(fill = "darkgreen", bins = 20) +
+  labs(title = "Residuals Histogram")
+
+qq_plot <- ggplot(data.frame(residuals), aes(sample = residuals)) +
+  geom_qq() +
+  geom_qq_line() +
+  labs(title = "QQ Plot of Residuals")
+
+ggarrange(hist_plot, qq_plot, ncol = 2, nrow = 1)
+```
+
+### Question 18 : Create a scatter plot of actual vs. predicted values using ggpubr with the following setting:
+
+```{r}
+ggscatter(augmented_data, x = "Ozone", y = ".fitted",
+          add = "reg.line", conf.int = TRUE,
+          cor.coef = TRUE, cor.method = "spearman",
+          ellipse = TRUE)
+```
+
+### Question 19 : How strong of a model do you think this is?
+
